@@ -36,6 +36,7 @@ func new_game():
 	update_vies_ui()
 	lava_speed = custom_lava_speed
 	$FirstPlatform.visited = false
+	nbr_platforms = 5
 	platform_last_x = 480
 	platform_last_y = 80
 
@@ -49,7 +50,8 @@ func game_over():
 	for platform in get_tree().get_nodes_in_group("group_platforms"):
 		platform.queue_free()
 	#Delete the Flag
-	$Flag.queue_free()
+	if has_node("Flag"):
+		$Flag.queue_free()
 	$MenuPrincipalCanvas.show()
 
 func hurt():
@@ -59,10 +61,8 @@ func hurt():
 	else:
 		update_vies_ui()
 	#reset
-	lava_speed = 0
 	reset_lava()
 	$Player.position = Vector2(512,432)
-	lava_speed = custom_lava_speed
 	# Reset the SpecialPlatforms
 	for special_platform in get_tree().get_nodes_in_group("group_special_platforms"):
 		if special_platform.is_effect_occurred == true:
@@ -91,6 +91,7 @@ func touched_flag(body):
 	score += 50
 	update_score_ui()
 	reset_lava()
+	lava_speed += 20
 	# Teleport Player to start
 	$Player.position = Vector2(512,432)
 	# Reset the SpecialPlatforms
