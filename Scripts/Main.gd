@@ -137,7 +137,7 @@ func generate_one_platform(is_final_platform):
 		platform_type = 0
 	else:
 		randomize()
-		platform_type = 2#randi()%3
+		platform_type = randi()%3
 	
 	# Generate x position of future platform.
 	var platform_x = 0
