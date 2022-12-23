@@ -1,7 +1,7 @@
 extends KinematicBody2D
 
 var speed = 450
-var jump_speed = 450
+var jump_speed = 600
 var gravity = 700
 var velocity = Vector2.ZERO
 
@@ -12,7 +12,7 @@ func _physics_process(delta):
 		velocity.x = -speed
 	if Input.is_action_pressed("ui_right"):
 		velocity.x = speed
-	if Input.is_action_pressed("ui_up"):
+	if Input.is_action_just_pressed("ui_up"):
 		velocity.y = -jump_speed
 		
 	velocity.y += gravity*delta
