@@ -5,14 +5,14 @@ onready var viewport_size_x = get_viewport().get_visible_rect().size.x
 var score = 0
 var nbr_health = 3
 ### Lava #####
-export var custom_lava_speed = 10
+export var custom_lava_speed = 20
 var lava_speed = 0
 ### Platforms #####
 const platform_radius = 96
-const platform_distance_height = 250
+const platform_distance_height = 200
 var platform_last_x = 480
 var platform_last_y = 80
-var jump_distance = 100
+export var jump_distance = 100 # Valeur objective
 var array_platform_tscn = [preload("res://Scenes/Platforms/StonePlatform.tscn"), preload("res://Scenes/Platforms/DirtPlatform.tscn"), preload("res://Scenes/Platforms/SpecialPlatform.tscn")]
 var flag_tscn = preload("res://Scenes/Platforms/Flag.tscn")
 var nbr_platforms = 5
@@ -35,6 +35,9 @@ func new_game():
 	nbr_health = 3
 	update_vies_ui()
 	lava_speed = custom_lava_speed
+	$FirstPlatform.visited = false
+	platform_last_x = 480
+	platform_last_y = 80
 
 func game_over():
 	print("game over!")
@@ -42,7 +45,11 @@ func game_over():
 	lava_speed = 0
 	reset_lava()
 	$Player.position = Vector2(512,432)
-	print("clear the platforms...")
+	#Clear the Platforms
+	for platform in get_tree().get_nodes_in_group("group_platforms"):
+		platform.queue_free()
+	#Delete the Flag
+	$Flag.queue_free()
 	$MenuPrincipalCanvas.show()
 
 func hurt():
@@ -51,6 +58,19 @@ func hurt():
 		game_over()
 	else:
 		update_vies_ui()
+	#reset
+	lava_speed = 0
+	reset_lava()
+	$Player.position = Vector2(512,432)
+	lava_speed = custom_lava_speed
+	# Reset the SpecialPlatforms
+	for special_platform in get_tree().get_nodes_in_group("group_special_platforms"):
+		if special_platform.is_effect_occurred == true:
+			special_platform.position.x += 2000
+			special_platform.is_effect_occurred = false
+	# Reset the "visited"
+	for platform in get_tree().get_nodes_in_group("group_platforms"):
+		platform.visited = false
 
 func visited_new_platform(is_special_platform):
 	if is_special_platform:
@@ -73,9 +93,15 @@ func touched_flag(body):
 	reset_lava()
 	# Teleport Player to start
 	$Player.position = Vector2(512,432)
+	# Reset the SpecialPlatforms
+	for special_platform in get_tree().get_nodes_in_group("group_special_platforms"):
+		if special_platform.is_effect_occurred == true:
+			special_platform.position.x += 2000
+			special_platform.is_effect_occurred = false
 	# Reset the "visited"
 	for platform in get_tree().get_nodes_in_group("group_platforms"):
 		platform.visited = false
+	
 	$FirstPlatform.visited = false
 
 #################################
@@ -111,7 +137,7 @@ func generate_one_platform(is_final_platform):
 		platform_type = 0
 	else:
 		randomize()
-		platform_type = randi()%3
+		platform_type = 2#randi()%3
 	
 	# Generate x position of future platform.
 	var platform_x = 0
@@ -166,6 +192,7 @@ func _on_FirstPlatform_body_entered(body):
 	if body != $Player or $FirstPlatform.visited:
 		return
 	$FirstPlatform.visited = true
+	print("FirstPlatform visited")
 	generate_the_new_platforms()
 
 #################################
