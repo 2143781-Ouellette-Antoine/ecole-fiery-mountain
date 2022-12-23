@@ -1,8 +1,8 @@
 extends KinematicBody2D
 
-var speed = 450
-var jump_speed = 600
-var gravity = 700
+export var speed = 450
+export var jump_speed = 600
+export var gravity = 700
 var velocity = Vector2.ZERO
 
 func _physics_process(delta):
